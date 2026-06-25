@@ -1,7 +1,10 @@
-FROM eclipe-temurin:21-jkd-alpine
-LABEL authors = "darkdestiny"
-ARG JAR-FILE=target/MinInventario4BM2-0.0.1-SNAPSHOT.jar
-COPY ${JAR-FILE} app_inventariomini.jar
-EXPOSE 8085
+FROM eclipse-temurin:21-jdk-alpine AS build
+WORKDIR /app
+COPY . .
+RUN ./mvnw clean package -DskipTests
 
-ENTRYPOINT ["java", "-jar", "app_inventariomini.jar"]
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8085
+ENTRYPOINT ["java", "-jar", "app.jar"]
